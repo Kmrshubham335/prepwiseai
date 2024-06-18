@@ -35,8 +35,9 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
-<!-- Connecting Backend with Drizzle and Neon DB  -->
-## Step 1: Install Dependencies
+###  Connecting Backend with Drizzle and Neon DB  
+**Step 1: Install Dependencies**
+
 Run the following commands to install necessary packages:
 ```bash
 npm i drizzle-orm
