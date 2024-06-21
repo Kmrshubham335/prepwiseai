@@ -3,35 +3,46 @@ import { UserButton } from '@clerk/nextjs'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import React, { useEffect } from 'react'
+import Link from 'next/link'
 
 export default function Header() {
   const path = usePathname()
-  useEffect(()=>{
+  useEffect(() => {
     console.log(path)
-  },[])
+  }, [path])
+
   return (
-    <div className='flex items-center justify-between m-3 p-3 shadow-lg rounded-full ' style={{ backgroundColor: '#001F3F', color: '#FFFFFF' }}>
-      <Image  src={'/logo.svg'} width={100} height={100} alt='logo' />
+    <div className='flex items-center justify-between m-3 p-3 shadow-lg rounded-full bg-blue-900 text-white'>
+      <Link href="/" aria-label="Home">
+        <Image src='/logo.svg' width={100} height={100} alt='logo' />
+      </Link>
       <ul className='flex gap-6'>
-        <li className={`hover:text-blue-400 hover:font-bold  cursor-pointer 
-          ${path=='/dashboard' && ' font-extrabold text-red-500'}
+        <li className={`hover:text-blue-400 hover:font-bold cursor-pointer 
+          ${path == '/dashboard' && 'font-extrabold text-red-500'}
           `}
-          >
-          DashBoard
-          </li>
+        >
+          <Link href="/dashboard" aria-label="Dashboard">Dashboard</Link>
+        </li>
         <li className={`hover:text-blue-400 hover:font-bold cursor-pointer
-        ${path=='/question' && 'font-extrabold text-red-500'}
+        ${path == '/question' && 'font-extrabold text-red-500'}
         `}
-        
-        >Questions</li>
+        >
+          <Link href="/question" aria-label="Questions">Questions</Link>
+        </li>
         <li className={`hover:text-blue-400 hover:font-bold cursor-pointer
           ${path == '/upgrade' && 'font-extrabold text-red-500'}
-          `}>Upgrade</li>
-        <li className={`hover:text-blue-400 cursor-pointer hover:font-bold 
-          ${path == '/howitworks'&& 'font-extrabold text-red-500'}
-          `}>How it works</li>
+          `}
+        >
+          <Link href="/upgrade" aria-label="Upgrade">Upgrade</Link>
+        </li>
+        <li className={`hover:text-blue-400 hover:font-bold cursor-pointer
+          ${path == '/howitworks' && 'font-extrabold text-red-500'}
+          `}
+        >
+          <Link href="/howitworks" aria-label="How it works">How it works</Link>
+        </li>
       </ul>
-      <UserButton/>
+      <UserButton />
     </div>
   )
 }
