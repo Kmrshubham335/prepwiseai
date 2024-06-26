@@ -44,7 +44,7 @@ function AddNewMockInterview() {
       const result = await chatSession.sendMessage(inputPrompt);
       
       const mockJsonResp = result.response.text().replace('```json', '').replace('```', '');
-      console.log(JSON.parse(mockJsonResp));
+      // console.log(JSON.parse(mockJsonResp));
       setJsonResponse(mockJsonResp)
 
       // Saving the resp in db

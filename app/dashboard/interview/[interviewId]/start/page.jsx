@@ -5,6 +5,7 @@ import { eq} from 'drizzle-orm';
 import { MockInterview } from '@/utils/schema';
 import QuestionSection from './_components/QuestionSection'
 import RecordAnswer from './_components/RecordAnswer';
+import { Button } from '@/components/ui/button';
 
 function StartInterview({params}) {
   const [interviewData,setInterviewData] = useState()
@@ -30,14 +31,22 @@ function StartInterview({params}) {
   return (
     <div>
       <div className='grid grid-col-1 md:grid-cols-2 gap-10' >
-        
         <QuestionSection
          mockInterviewQuestion={mockInterviewQuestion} 
         activeQuestionIndex={activeQuestionIndex}/>
         <RecordAnswer
          mockInterviewQuestion={mockInterviewQuestion} 
          activeQuestionIndex={activeQuestionIndex}
+         interviewData={interviewData}
         />  
+      </div>
+      <div className='flex justify-end gap-5' >
+       {activeQuestionIndex>0 && 
+       <Button onClick={()=>setActiveQuestionIndex(activeQuestionIndex-1)} >Previous Question</Button>}
+      {activeQuestionIndex!=mockInterviewQuestion?.length-1 && 
+      <Button onClick={()=>setActiveQuestionIndex(activeQuestionIndex+1)}>Next Question</Button>}
+       {activeQuestionIndex==mockInterviewQuestion?.length-1 && 
+       <Button>End Interview</Button>}
       </div>
     </div>
   )

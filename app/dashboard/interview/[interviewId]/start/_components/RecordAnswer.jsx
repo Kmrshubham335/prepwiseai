@@ -7,9 +7,15 @@ import useSpeechToText from "react-hook-speech-to-text";
 import { Mic } from "lucide-react";
 import { toast } from "sonner";
 import { chatSession } from "@/utils/GeminiModalAI";
+import { db } from "@/utils/db";
+import { UserAnswer } from "@/utils/schema";
+import { useUser } from "@clerk/nextjs";
+import moment from "moment/moment";
 
-function RecordAnswer({ mockInterviewQuestion, activeQuestionIndex }) {
+function RecordAnswer({ mockInterviewQuestion, activeQuestionIndex,interviewData }) {
   const [userAnswer, setUserAnswer] = useState("");
+  const {user} = useUser()
+  const [loading,setLoading] = useState(false)
   const {
     error,
     interimResult,
@@ -31,16 +37,13 @@ function RecordAnswer({ mockInterviewQuestion, activeQuestionIndex }) {
 
   const SaveUserAnswer = async () => {
     if (isRecording) {
+      setLoading(true)
       stopSpeechToText();
 
-      // Validation to ensure user answer length is sufficient
-      if (userAnswer.trim().length < 10) {
-        toast.error("Error while saving your record, please speak clearly");
-        return;
-      }
+
 
       const feedbackPrompt = `
-You are an AI expert in providing constructive feedback on interview answers. For the following question and user answer, please provide a detailed rating and feedback.
+You are an AI expert in providing constructive feedback on interview answers. For the following question and user answer, please provide a detailed different rating , feedback and suggestion everytime whenever user ask.
 
 Question: "${mockInterviewQuestion[activeQuestionIndex]?.question}"
 
@@ -63,7 +66,6 @@ Based on the above question and answer, please provide:
 4. Data for visualizations:
    - A bar chart showing the rating in each category (Communication, Confidence, Clarity, Relevance).
    - A pie chart showing the distribution of strengths and areas for improvement.
-   - A line chart showing the trend if multiple questions and answers were provided (if applicable).
 
 Format your response in JSON as follows:
 {
@@ -83,15 +85,6 @@ Format your response in JSON as follows:
     "pieChart": {
       "sections": ["Strengths", "Areas for Improvement"],
       "values": [<strengths_value>, <areas_for_improvement_value>]
-    },
-    "lineChart": {
-      "questions": ["Question 1", "Question 2", "Question 3", ...],
-      "ratings": {
-        "communication": [<rating1>, <rating2>, <rating3>, ...],
-        "confidence": [<rating1>, <rating2>, <rating3>, ...],
-        "clarity": [<rating1>, <rating2>, <rating3>, ...],
-        "relevance": [<rating1>, <rating2>, <rating3>, ...]
-      }
     }
   }
 }
@@ -112,17 +105,38 @@ Please ensure the feedback is constructive and aimed at helping the user improve
           .replace("```json", "")
           .replace("```", "");
           console.log(mockJsonResp);
-          toast.success("Your recording has been saved successfully!");
           const JsonFeedbackResp= JSON.parse(mockJsonResp)
+
+          const resp = await db.insert(UserAnswer)
+          .values({
+            mockIdRef:interviewData ?.mockId,
+            question:mockInterviewQuestion[activeQuestionIndex]?.question,
+            correctAns:mockInterviewQuestion[activeQuestionIndex]?.answer,
+            userAns:userAnswer,
+            feedback:JsonFeedbackResp?.feedback,
+            rating:JsonFeedbackResp?.rating,
+            suggestions:JsonFeedbackResp?.suggestions,
+            userEmail:user?.primaryEmailAddress.emailAddress,
+            createdAt:moment().format('DD-MM-YYYY')
+          })
+
+          if(resp)
+            {
+              toast.success("Your recording has been saved successfully!");
+            }
+            setUserAnswer('')
+            setLoading(false)
       } catch (error) {
         console.error(error);
         toast.error("Error while saving your record");
       }
+
     } else {
       startSpeechToText();
       toast("Recording started");
     }
   };
+
 
   return (
     <div className="flex flex-col items-center justify-center p-4">
@@ -145,6 +159,7 @@ Please ensure the feedback is constructive and aimed at helping the user improve
         />
       </div>
       <Button
+      disabled={loading}
         className="my-1"
         onClick={SaveUserAnswer}
         aria-label={isRecording ? "Stop Recording" : "Start Recording"}
@@ -158,8 +173,6 @@ Please ensure the feedback is constructive and aimed at helping the user improve
           "Record Answer"
         )}
       </Button>
-
-      <Button onClick={() => console.log(userAnswer)}>Show Answer</Button>
     </div>
   );
 }
