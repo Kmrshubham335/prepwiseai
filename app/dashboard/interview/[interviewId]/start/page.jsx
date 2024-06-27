@@ -6,6 +6,7 @@ import { MockInterview } from '@/utils/schema';
 import QuestionSection from './_components/QuestionSection'
 import RecordAnswer from './_components/RecordAnswer';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 function StartInterview({params}) {
   const [interviewData,setInterviewData] = useState()
@@ -46,7 +47,9 @@ function StartInterview({params}) {
       {activeQuestionIndex!=mockInterviewQuestion?.length-1 && 
       <Button onClick={()=>setActiveQuestionIndex(activeQuestionIndex+1)}>Next Question</Button>}
        {activeQuestionIndex==mockInterviewQuestion?.length-1 && 
-       <Button>End Interview</Button>}
+       <Link  href={'/dashboard/interview/'+interviewData?.mockId+"/feedback"} >
+        <Button>End Interview</Button>
+       </Link>}
       </div>
     </div>
   )

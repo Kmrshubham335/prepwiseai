@@ -12,15 +12,16 @@ import { UserAnswer } from "@/utils/schema";
 import { useUser } from "@clerk/nextjs";
 import moment from "moment/moment";
 
-function RecordAnswer({ mockInterviewQuestion, activeQuestionIndex,interviewData }) {
+function RecordAnswer({ mockInterviewQuestion, activeQuestionIndex, interviewData }) {
   const [userAnswer, setUserAnswer] = useState("");
-  const {user} = useUser()
-  const [loading,setLoading] = useState(false)
+  const { user } = useUser();
+  const [loading, setLoading] = useState(false);
   const {
     error,
     interimResult,
     isRecording,
     results,
+    setResults,
     startSpeechToText,
     stopSpeechToText,
   } = useSpeechToText({
@@ -37,13 +38,11 @@ function RecordAnswer({ mockInterviewQuestion, activeQuestionIndex,interviewData
 
   const SaveUserAnswer = async () => {
     if (isRecording) {
-      setLoading(true)
+      setLoading(true);
       stopSpeechToText();
 
-
-
       const feedbackPrompt = `
-You are an AI expert in providing constructive feedback on interview answers. For the following question and user answer, please provide a detailed different rating , feedback and suggestion everytime whenever user ask.
+You are an AI expert in providing constructive feedback on interview answers. For the following question and user answer, please provide a detailed different rating, feedback, and suggestion every time the user asks.
 
 Question: "${mockInterviewQuestion[activeQuestionIndex]?.question}"
 
@@ -62,7 +61,7 @@ Based on the above question and answer, please provide:
 3. Detailed suggestions and improvements:
    - Specific steps the user can take to improve their answers in future interviews.
    - Examples or strategies to address weaknesses identified in the feedback.
-   - Provide the same answer for the given question so that user can understand how to give the answer for the question.
+   - Provide the same answer for the given question so that the user can understand how to give the answer for the question.
 4. Data for visualizations:
    - A bar chart showing the rating in each category (Communication, Confidence, Clarity, Relevance).
    - A pie chart showing the distribution of strengths and areas for improvement.
@@ -100,43 +99,45 @@ Please ensure the feedback is constructive and aimed at helping the user improve
 
       try {
         const result = await chatSession.sendMessage(feedbackPrompt);
-        const mockJsonResp = result.response
-          .text()
-          .replace("```json", "")
-          .replace("```", "");
-          console.log(mockJsonResp);
-          const JsonFeedbackResp= JSON.parse(mockJsonResp)
+        const rawResponse = await result.response.text();
+        console.log('Raw Response:', rawResponse);
 
-          const resp = await db.insert(UserAnswer)
-          .values({
-            mockIdRef:interviewData ?.mockId,
-            question:mockInterviewQuestion[activeQuestionIndex]?.question,
-            correctAns:mockInterviewQuestion[activeQuestionIndex]?.answer,
-            userAns:userAnswer,
-            feedback:JsonFeedbackResp?.feedback,
-            rating:JsonFeedbackResp?.rating,
-            suggestions:JsonFeedbackResp?.suggestions,
-            userEmail:user?.primaryEmailAddress.emailAddress,
-            createdAt:moment().format('DD-MM-YYYY')
-          })
+        const cleanJsonResp = rawResponse.replace(/```json/, '').replace(/```/, '').trim();
+        console.log('Clean JSON Response:', cleanJsonResp);
 
-          if(resp)
-            {
-              toast.success("Your recording has been saved successfully!");
-            }
-            setUserAnswer('')
-            setLoading(false)
+        const JsonFeedbackResp = JSON.parse(cleanJsonResp);
+        // console.log('Parsed JSON:', JsonFeedbackResp);
+
+        const resp = await db.insert(UserAnswer).values({
+          mockIdRef: interviewData?.mockId,
+          question: mockInterviewQuestion[activeQuestionIndex]?.question,
+          correctAns: mockInterviewQuestion[activeQuestionIndex]?.answer,
+          userAns: userAnswer,
+          feedback: JsonFeedbackResp?.feedback,
+          rating: JSON.stringify(JsonFeedbackResp?.rating),
+          suggestions: JsonFeedbackResp?.suggestions,
+          userEmail: user?.primaryEmailAddress.emailAddress,
+          createdAt: moment().format('DD-MM-YYYY')
+        });
+
+        // console.log('Database Response:', resp);
+
+        if (resp) {
+          toast.success("Your recording has been saved successfully!");
+          setUserAnswer('');
+          setResults([]);
+        }
+        setLoading(false);
       } catch (error) {
-        console.error(error);
+        console.error('Error:', error);
         toast.error("Error while saving your record");
+        setLoading(false);
       }
-
     } else {
       startSpeechToText();
       toast("Recording started");
     }
   };
-
 
   return (
     <div className="flex flex-col items-center justify-center p-4">
@@ -159,7 +160,7 @@ Please ensure the feedback is constructive and aimed at helping the user improve
         />
       </div>
       <Button
-      disabled={loading}
+        disabled={loading}
         className="my-1"
         onClick={SaveUserAnswer}
         aria-label={isRecording ? "Stop Recording" : "Start Recording"}
@@ -173,6 +174,7 @@ Please ensure the feedback is constructive and aimed at helping the user improve
           "Record Answer"
         )}
       </Button>
+      {/* <Button onClick={() => console.log(userAnswer)}>Show Answer</Button> */}
     </div>
   );
 }
