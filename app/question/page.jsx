@@ -2,7 +2,7 @@ import React from 'react'
 
 function questionPage() {
   return (
-    <div>questionPage</div>
+    <div className='text-bold font-sans' >This page will update soon</div>
   )
 }
 

@@ -27,19 +27,19 @@ export default function Header() {
         ${path == '/question' && 'font-extrabold text-red-500'}
         `}
         >
-          <Link href="/question" aria-label="Questions">Questions</Link>
+          <Link href="/question" aria-label="Questions">Resources</Link>
         </li>
         <li className={`hover:text-blue-400 hover:font-bold cursor-pointer
           ${path == '/upgrade' && 'font-extrabold text-red-500'}
           `}
         >
-          <Link href="/upgrade" aria-label="Upgrade">Upgrade</Link>
+          {/* <Link href="/upgrade" aria-label="Upgrade">Upgrade</Link>
         </li>
         <li className={`hover:text-blue-400 hover:font-bold cursor-pointer
           ${path == '/howitworks' && 'font-extrabold text-red-500'}
           `}
-        >
-          <Link href="/howitworks" aria-label="How it works">How it works</Link>
+        > */}
+          <Link href="/howitworks" aria-label="How it works">Frequently Ask Question</Link>
         </li>
       </ul>
       <UserButton />

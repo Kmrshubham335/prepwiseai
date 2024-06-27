@@ -46,7 +46,7 @@ export default function Home() {
           </div>
           {/* Filler text to fill the page */}
           <p className="mt-12 text-lg text-gray-800">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ac interdum libero. Phasellus mattis ex at dolor condimentum, vitae consequat ipsum varius. Nulla at ipsum felis. Integer finibus augue sed lacus volutpat, at vestibulum leo laoreet. Sed ac felis sed velit volutpat maximus. Integer ultricies scelerisque justo, sit amet aliquam ligula accumsan vitae. Curabitur sit amet lorem in nisi ultrices vulputate. Suspendisse potenti. In hac habitasse platea dictumst. Fusce ullamcorper eros vel pretium tristique. Nam pharetra nisl eu mauris facilisis, eget eleifend sapien ultrices. Sed in dictum nunc. Nullam vel libero tristique, blandit erat eu, feugiat nulla. Ut in lacus tincidunt, malesuada est non, tincidunt ex. Nam ultricies, metus vel viverra dictum, libero purus venenatis tortor, sit amet consequat metus nisi non quam. Ut suscipit augue nec massa sodales, eget pharetra libero tempor.
+          PrepWiseAI is your ultimate companion in mastering the art of interviews. Leveraging advanced AI technology, PrepWiseAI provides personalized insights and comprehensive feedback tailored to your unique strengths and weaknesses.With PrepWiseAI, you can practice at your own pace, gain confidence, and unlock your full potential to succeed in any interview scenario. 
           </p>
         </div>
       </div>

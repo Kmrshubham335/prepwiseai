@@ -15,7 +15,6 @@ import { useRouter } from 'next/navigation';
 function Feedback({ params }) {
   const [feedBackList, setFeedbackList] = useState([]);
   const router = useRouter()
-
   useEffect(() => {
     GetFeedback();
   }, []);
@@ -33,8 +32,12 @@ function Feedback({ params }) {
 
   return (
     <div className='p-10'>
-      <h2 className='text-3xl font-serif font-bold text-green-400'>Congratulation!</h2>
-      <h2 className='font-bold font-serif text-2xl'>Here is your interview feedback</h2>
+      {feedBackList?.length==0?
+      <h2 className=' text-bold text-gray-500 text-lg font-sans'>No Interview Feedback Record Found</h2> 
+      : 
+      <>
+            <h2 className='text-3xl font-serif font-bold text-green-400'>Congratulation!</h2>
+            <h2 className='font-bold font-serif text-2xl'>Here is your interview feedback</h2>
       <h2 className='text-sm text-gray-500'>
         Find below interview question with correct answer,Your answer with feedback,suggestion and rating for improvement
       </h2>
@@ -54,7 +57,7 @@ function Feedback({ params }) {
           </CollapsibleContent>
         </Collapsible>
       ))}
-
+    </>}
       <Button onClick={() => router.replace('/dashboard')}>Go Home</Button>
     </div>
   );
